@@ -6,6 +6,7 @@ import (
 	"main/handlers"
 	"main/middleware"
 	"main/models"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
@@ -43,7 +44,7 @@ func main() {
 	r.GET("/transactions/my-transactions", handlers.GetTransactionHistoriesForUser(db))
 	r.GET("/transactions/user-transactions", middleware.AdminAuthMiddleware(), handlers.GetAllTransactionHistories(db))
 
-	if err := r.Run(":8080"); err != nil {
+	if err := r.Run(":" + os.Getenv("PORT")); err != nil {
 		log.Fatal("Failed to run server:", err)
 	}
 }
