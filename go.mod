@@ -1,7 +1,7 @@
-// +heroku goVersion go1.23
+// +heroku goVersion go1.20
 module main
 
-go 1.21.5
+go 1.21
 
 require (
 	github.com/bytedance/sonic v1.10.2 // indirect
