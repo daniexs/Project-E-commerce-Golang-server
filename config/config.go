@@ -22,7 +22,9 @@ func GetDbConfig() *DBConfig {
 
 func (config *DBConfig) GetDBURL() string {
 	return fmt.Sprintf(
-		"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
-		config.Host, config.Port, config.User, config.DBName, config.Password,
+		"user=postgres password=p6H2HFVhOSggar5T host=db.unahekodberrlcmdukvl.supabase.co port=5432 dbname=postgres",
 	)
 }
+
+// "host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
+// config.Host, config.Port, config.User, config.DBName, config.Password,
