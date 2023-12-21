@@ -19,13 +19,22 @@ func CreateUser(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+		newUser.Balance = 1
+		newUser.Role = "customer"
+
 		existingUser := models.User{}
 		if err := db.Where("email = ?", newUser.Email).First(&existingUser).Error; err == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Email already exists"})
 			return
 		}
+
+		if err := helper.Validate(newUser); err != nil {
+			c.JSON(http.StatusBadRequest, err)
+			return
+		}
+
 		newUser.Balance = 0
-		newUser.Role = "customer"
+
 		hashed, err := helper.HashPassword(newUser.Password)
 		if err != nil {
 			fmt.Println("Error hashing password:", err)
@@ -94,10 +103,16 @@ func UpdateBalance(db *gorm.DB) gin.HandlerFunc {
 
 		// Get the new balance value from the request body
 		var updateData struct {
-			Balance int `json:"balance"`
+			Balance int `json:"balance" validate:"min=0,max=100000000,required"`
 		}
+
 		if err := c.ShouldBindJSON(&updateData); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := helper.Validate(updateData); err != nil {
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 

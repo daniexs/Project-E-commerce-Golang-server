@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"main/helper"
 	"main/models"
 	"net/http"
 	"strconv"
@@ -11,7 +12,7 @@ import (
 )
 
 type CreateCategoryInput struct {
-	Type string `json:"type" binding:"required"`
+	Type string `json:"type" validate:"required"`
 }
 
 func CreateCategory(db *gorm.DB) gin.HandlerFunc {
@@ -19,6 +20,10 @@ func CreateCategory(db *gorm.DB) gin.HandlerFunc {
 		var input CreateCategoryInput
 		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err := helper.Validate(input); err != nil {
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
@@ -85,7 +90,7 @@ func GetCategories(db *gorm.DB) gin.HandlerFunc {
 }
 
 type UpdateCategoryInput struct {
-	Type string `json:"type" binding:"required"`
+	Type string `json:"type" validate:"required"`
 }
 
 func UpdateCategory(db *gorm.DB) gin.HandlerFunc {
@@ -106,6 +111,11 @@ func UpdateCategory(db *gorm.DB) gin.HandlerFunc {
 		var input UpdateCategoryInput
 		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := helper.Validate(input); err != nil {
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 

@@ -3,25 +3,19 @@ package models
 import (
 	"time"
 
-	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
-func (u *User) Validate() error {
-	validate := validator.New()
-	return validate.Struct(u)
-}
-
 type User struct {
 	gorm.Model
-	ID        uint      `gorm:"primaryKey" json:"id" validate:"-"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
 	FullName  string    `json:"full_name" validate:"required"`
-	Email     string    `json:"email" validate:"required,email,unique"`
+	Email     string    `validate:"required,email" json:"email" `
 	Password  string    `json:"password" validate:"required,min=6"`
 	Role      string    `json:"role" validate:"required,oneof=admin customer"`
 	Balance   int       `json:"balance" validate:"required,min=0,max=100000000"`
-	CreatedAt time.Time `json:"created_at" validate:"-"`
-	UpdatedAt time.Time `json:"updated_at" validate:"-"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type Product struct {

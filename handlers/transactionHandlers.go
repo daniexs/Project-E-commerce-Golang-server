@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"main/helper"
 	"main/models"
 	"net/http"
 
@@ -93,8 +94,8 @@ func GetAllTransactionHistories(db *gorm.DB) gin.HandlerFunc {
 }
 
 type CreateTransactionInput struct {
-	ProductID uint `json:"product_id" binding:"required"`
-	Quantity  int  `json:"quantity" binding:"required"`
+	ProductID uint `json:"product_id" validate:"required"`
+	Quantity  int  `json:"quantity" validate:"required"`
 }
 
 func CreateTransaction(db *gorm.DB) gin.HandlerFunc {
@@ -113,6 +114,11 @@ func CreateTransaction(db *gorm.DB) gin.HandlerFunc {
 		var input CreateTransactionInput
 		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := helper.Validate(input); err != nil {
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 

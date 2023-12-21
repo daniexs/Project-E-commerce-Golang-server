@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"main/helper"
 	"main/models"
 	"net/http"
 	"strconv"
@@ -11,10 +12,10 @@ import (
 )
 
 type CreateProductInput struct {
-	Title      string `json:"title" binding:"required"`
-	Price      int    `json:"price" binding:"required"`
-	Stock      int    `json:"stock" binding:"required"`
-	CategoryID uint   `json:"category_id" binding:"required"`
+	Title      string `json:"title" validate:"required"`
+	Price      int    `json:"price" validate:"required,min=0,max=50000000"`
+	Stock      int    `json:"stock" validate:"required,min=5"`
+	CategoryID uint   `json:"category_id" validate:"required"`
 }
 
 func CreateProduct(db *gorm.DB) gin.HandlerFunc {
@@ -38,6 +39,11 @@ func CreateProduct(db *gorm.DB) gin.HandlerFunc {
 			Price:      input.Price,
 			Stock:      input.Stock,
 			CategoryID: input.CategoryID,
+		}
+
+		if err := helper.Validate(input); err != nil {
+			c.JSON(http.StatusBadRequest, err)
+			return
 		}
 
 		// Save the new product to the database
@@ -84,13 +90,6 @@ func GetAllProducts(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-type UpdateProductInput struct {
-	Title      string `json:"title" binding:"required"`
-	Price      int    `json:"price" binding:"required"`
-	Stock      int    `json:"stock" binding:"required"`
-	CategoryID uint   `json:"category_id" binding:"required"`
-}
-
 func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		productID := c.Param("productId")
@@ -106,9 +105,14 @@ func UpdateProduct(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		var input UpdateProductInput
+		var input CreateProductInput
 		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if err := helper.Validate(input); err != nil {
+			c.JSON(http.StatusBadRequest, err)
 			return
 		}
 
