@@ -1,3 +1,4 @@
+// +heroku goVersion go1.21.5
 module main
 
 go 1.21.5
